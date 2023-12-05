@@ -5,9 +5,16 @@ from PIL import Image
 from tensorflow.keras import layers
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications import ResNet101
+import requests
+import boto3
 
 # define classes name   
 class_names = ['glioma','meningioma','notumor','pituitary']
+
+url = 'https://datamining-final.s3.amazonaws.com/resnet101_weights.pickle'
+
+# Descargar el archivo
+response = requests.get(url)
 
 resnet101 = ResNet101(
     weights='imagenet',  # Load weights pre-trained on ImageNet.
@@ -32,8 +39,12 @@ x = layers.Dropout(0.5)(x)
 predictions = layers.Dense(4, activation='softmax')(x)
 resnet101_model = Model(inputs = resnet101.input, outputs = predictions)
 
-with open('models/resnet101_weights.pickle', 'rb') as f:
-    resnet101_weights = pickle.load(f)
+# Verificar que la descarga fue exitosa
+if response.status_code == 200:
+    # Cargar los datos del archivo pickle directamente desde el contenido de la respuesta
+    resnet101_weights = pickle.loads(response.content)
+else:
+    print("Error al descargar el archivo:", response.status_code)
 
 resnet101_model.set_weights(resnet101_weights)
 
