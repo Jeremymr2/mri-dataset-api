@@ -6,7 +6,6 @@ from tensorflow.keras import layers
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications import ResNet101
 import requests
-import boto3
 
 # define classes name   
 class_names = ['glioma','meningioma','notumor','pituitary']
